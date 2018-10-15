@@ -1,0 +1,46 @@
+To Begin:
+source ~/.profile   ->implements changes to enable virtual environment
+workon cv    		->enter virtual environment
+
+raspistill 
+
+Error:
+When trying to take a picture
+	mmal: mmal_vc_component_enable: failed to enable component: ENOSPC
+	mmal: camera component couldn't be enabled
+	mmal: main: Failed to create camera component
+	mmal: Failed to run camera app. Please check for firmware updates
+Solution:
+sudo rpi-update
+
+Error:
+sudo rpi-update returns
+cp: cannot create regular file '//opt/vc/bin/raspistill': Text file busy
+r
+Solution: taking the picture initially with raspistill left the text file 'busy'
+reboot and run sudo rpi-update again before using raspistill command
+
+
+Other Troubleshooting:
+
+sudo rpi-update  	->update firmware 
+sudo nano /boot/config.txt	->set GPU memory to 144
+sudo vcgencmd get_camera	->returns supported=1 detected=1 so camera is connected properly
+
+
+ 
+
+
+
+import numpy as np
+import cv2
+
+img = cv2.imread('lion.jpg',cv2.IMREAD_GRAYSCALE )
+cv2.imshow('image', img)
+waitKey(0)
+
+cv2.destroyAllWindows()
+
+difference = cv2.subtract(img1, img2)
+result = np.any(difference) # if diff = 0s return false
+cv2.imwrite("result.jpg", difference)
