@@ -6,11 +6,16 @@ class Line:
 		self.x1 = x1
 		self.x2 = x2
 		self.y1 = y1
-		self.y2 = y2 
+		self.y2 = y2
+
 
 		# Change in x and y
 		self.dx = self.x2 - self.x1
 		self.dy = self.y2 - self.y1
+
+		centerX = abs(self.dx)
+		centerY = abs(self.dy)
+		self.center = (centerX - centerY)/2
 
 		if abs(self.dx) > abs(self.dy):
 			self.orientation = 'horizontal'
@@ -34,3 +39,5 @@ class Line:
 		x = int(x)
 		y = int(y)
 		return x,y
+
+
