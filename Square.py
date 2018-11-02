@@ -1,21 +1,67 @@
 import cv2
 import numpy as np
+import math
 
 class Square:
 
-	def __init__(self, c1, c2, c3, c4, position):
+	def __init__(self, image, c1, c2, c3, c4, position):
 
+		# Corners
 		self.c1 = c1
 		self.c2 = c2
 		self.c3 = c3
 		self.c4 = c4
 
+		# Position
 		self.position = position
 
-		self.cnt = np.array([c1,c2,c4,c3],dtype=np.int32)
+		# npArray of corners
+		self.contour = np.array([c1,c2,c4,c3],dtype=np.int32)
+
+		# Center of square
+		M = cv2.moments(self.contour)
+		cx = int(M['m10'] / M['m00'])
+		cy = int(M['m01'] / M['m00'])
+		# ROI for image differencing
+		self.roi = (cx, cy)
+		self.radius = 15
+
+		self.emptyColor = self.roiColor(image)
 
 	def draw(self, image, color=(0,0,255),thickness=2):
 
-		ctr = np.array(self.cnt).reshape((-1,1,2)).astype(np.int32)
+		# Formattign npArray of corners for drawContours
+		ctr = np.array(self.contour).reshape((-1,1,2)).astype(np.int32)
 		cv2.drawContours(image, [ctr], 0, (0,0,255), 3)
+
+	def drawROI(self, image, color, thickness = 1):
+
+		cv2.circle(image, self.roi, self.radius, color,thickness)
+
+
+	def roiColor(self, image):
+		# Initialise mask
+		maskImage = np.zeros((image.shape[0], image.shape[1]), np.uint8)
+		# Draw the ROI circle on the mask
+		cv2.circle(maskImage, self.roi, self.radius, (255, 255, 255), -1)
+		# Find the average color
+		average_raw = cv2.mean(image, mask=maskImage)[::-1]
+		# Need int format so reassign variable
+		average = (int(average_raw[1]), int(average_raw[2]), int(average_raw[3]))
+
+		return average
+
+	def classify(self, image):
+
+		rgb = self.roiColor(image)
+
+		for i in range(0,3):
+			sum = (self.emptyColor[i] - rgb[i])**2
+
+		distance = math.sqrt(sum)
+
+		if distance > 40:
+			print("Square is occupied:" + self.position)
+			#cv2.circle(image, self.roi,self.radius,(0,0,255),2)
+			self.drawROI(image,(0,0,255),1)
 

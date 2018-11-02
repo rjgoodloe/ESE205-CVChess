@@ -10,12 +10,13 @@ debug =  True
 
 class board_Recognition:
 
-	def __init__(self, image):
+	def __init__(self, image,image2):
 
 		self.image = image
+		self.image2 = imutils.resize(image2, width=600)
 
 
-	def initialize_Board(self, image):
+	def initialize_Board(self, image, image2):
 
 		adaptiveThresh,img = self.clean_Image(image)
 
@@ -28,7 +29,7 @@ class board_Recognition:
 		corners = self.findCorners(horizontal, vertical, colorEdges)
 
 		# find squares
-		squares = self.findSquares(corners, colorEdges)
+		squares = self.findSquares(corners, img, image2)
 
 		#board = Board.makeBoard(squares)
 		# create board
@@ -46,7 +47,7 @@ class board_Recognition:
 			cv2.imshow("blur",img)
 			cv2.waitKey(0)
 			cv2.destroyAllWindows()
-			cv2.imwrite("Pictures/blur.png",img)
+			cv2.imwrite("Blur.png",img)
 
 		# Convert to grayscale
 		gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
@@ -59,7 +60,7 @@ class board_Recognition:
 			cv2.imshow("Adaptive Thresholding", adaptiveThresh)
 			cv2.waitKey(0)
 			cv2.destroyAllWindows()
-			cv2.imwrite("Pictures/Adaptive_Thresholding.png",adaptiveThresh)
+			cv2.imwrite("Adaptive_Thresholding.png",adaptiveThresh)
 
 		return adaptiveThresh,img
 
@@ -97,6 +98,7 @@ class board_Recognition:
 			# Show image with contours drawn
 			cv2.imshow("Chess Boarder",imgContours)
 			cv2.waitKey(0)
+			cv2.imwrite("Boarder.png",imgContours)
 			cv2.destroyAllWindows()
 
 		# Epsilon parameter needed to fit contour to polygon
@@ -116,10 +118,10 @@ class board_Recognition:
 
 		if debug:
 			# Show image with mask drawn
- 			cv2.imshow("mask",extracted)
+			cv2.imshow("mask",extracted)
 			cv2.waitKey(0)
 			cv2.destroyAllWindows()
-			cv2.imwrite("Pictures/Mask.png",extracted)
+			cv2.imwrite("Mask.png",extracted)
 		return extracted
 
 	def findEdges(self, image):
@@ -130,7 +132,7 @@ class board_Recognition:
 			cv2.imshow("Canny", edges)
 			cv2.waitKey(0)
 			cv2.destroyAllWindows()
-			cv2.imwrite("Pictures/Edge_Detection.png",edges)
+			cv2.imwrite("Edges.png",edges)
 
 		# Convert edges image to grayscale
 		colorEdges = cv2.cvtColor(edges,cv2.COLOR_GRAY2BGR)
@@ -143,15 +145,15 @@ class board_Recognition:
 
 		# Draw lines
 		a,b,c = lines.shape
-		for i in range(a):
-			cv2.line(colorEdges, (lines[i][0][0], lines[i][0][1]), (lines[i][0][2], lines[i][0][3]), (0,255,0),2,cv2.LINE_AA)
+#		for i in range(a):
+#			cv2.line(colorEdges, (lines[i][0][0], lines[i][0][1]), (lines[i][0][2], lines[i][0][3]), (0,255,0),2,cv2.LINE_AA)
 
-		if debug:
+		if  debug:
 			# Show image with lines drawn
 			cv2.imshow("Lines",colorEdges)
 			cv2.waitKey(0)
 			cv2.destroyAllWindows()
-			cv2.imwrite("Pictures/Line_Detection.png",colorEdges)
+			cv2.imwrite("Lines.png",colorEdges)
 
 		# Create line objects and sort them by orientation (horizontal or vertical)
 		horizontal = []
@@ -186,7 +188,7 @@ class board_Recognition:
 				dedupeCorners.append(c)
 
 		for d in dedupeCorners:
-			cv2.circle(colorEdges, (d[0],d[1]), 10, (255,0,0))
+			cv2.circle(colorEdges, (d[0],d[1]), 10, (0,0,255))
 
 
 		if debug:
@@ -194,13 +196,13 @@ class board_Recognition:
 			cv2.imshow("Corners",colorEdges)
 			cv2.waitKey(0)
 			cv2.destroyAllWindows()
-			cv2.imwrite("Pictures/Corners.png",colorEdges)
+			cv2.imwrite("Corners.png",colorEdges)
 
 
 
-			return dedupeCorners
+		return dedupeCorners
 
-	def findSquares(self, corners, colorEdges):
+	def findSquares(self, corners, colorEdges, image2):
 
 		corners.sort(key=lambda x: x[0])
 		rows = [[],[],[],[],[],[],[],[],[]]
@@ -213,6 +215,7 @@ class board_Recognition:
 
 		letters = ['a','b','c','d','e','f','g','h']
 		numbers = ['1','2','3','4','5','6','7','8']
+		Squares = []
 		for r in rows:
 			r.sort(key=lambda y: y[1])
 		for r in range(0,8):
@@ -223,17 +226,22 @@ class board_Recognition:
 				c4 = rows[r + 1][c + 1]
 
 				position = letters[r] + numbers[c]
-				newSquare = Square(c1,c2,c3,c4,position)
-				if r == 2:
-					newSquare.draw(colorEdges,(0,0,255),2)
-					print(position)
+				newSquare = Square(colorEdges,c1,c2,c3,c4,position)
+				newSquare.draw(colorEdges,(0,0,255),2)
+				#newSquare.drawROI(colorEdges,(0,0,255),10)
+				newSquare.classify(colorEdges)
+				Squares.append(newSquare)
+				#print(newSquare.roiColor(colorEdges))
+		for s in Squares:
+			s.classify(self.image2)
 
 
 		if debug:
                         #Show image with corners circled
-                        cv2.imshow("Squares",colorEdges)
-                        cv2.waitKey(0)
-                        cv2.destroyAllWindows()
-                        cv2.imwrite("Pictures/Squares.png",colorEdges)
-
+			cv2.imshow("Squares",colorEdges)
+			cv2.imshow("Diff",self.image2)
+			cv2.waitKey(0)
+			cv2.destroyAllWindows()
+			cv2.imwrite("Squares.png",colorEdges)
+			cv2.imwrite("PieceDetect.png",self.image2)
 
