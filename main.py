@@ -1,31 +1,61 @@
+import imutils
 import cv2
 import argparse
+from ChessEng import ChessEng
 from board_Recognition import board_Recognition
-from image_Analysis import image_Prep
+from Board import Board
+from Camera import Camera
+
+#Prompt initialize empty board
+#Take picture of board initially empty
+#camera = Camera()
+#image = camera.takePicture()
+
+empty = cv2.imread("newEmpty.jpg")
+end = cv2.imread("end.jpg")
+move1 = cv2.imread("move1.jpg")
+move2 = cv2.imread("move2.jpg")
+start = cv2.imread("start.jpg")
+
+# Take image and make squares and store empty color value
+boardRec = board_Recognition(empty)
+board = boardRec.initialize_Board(empty)
+board.assignState()
+# prompt fill board with pieces
+# on button click -> begin game
+# previous = camera.takePicture()
+#gameOver = False
+#while !gameOver
+# 	prompt player  move
+# on button click:
+#	current = camera.takePicture()
+# 	move = board.determineChanges(previous,current)
+# 	give move to chess engine
+# 	print response to touchscreen
+# on button click:
+#	previous = current
+#	current = camera.takePicture()
+# 	move = board.determineChanges(previous,current)
+#	if response != move: throw error
+#	previous = current
 
 
-# construct the argument parse and parse the arguments
-#ap = argparse.ArgumentParser()
-#ap.add_argument("-i", "--image", required=True,
-#                help="path to the input image")
-#ap.add_argument("-i", "--image2", required=True,
-#                help="path to the input image")
+emptyResize = imutils.resize(empty, width=400, height = 400)
+endResize = imutils.resize(end, width=400, height = 400)
+move1Resize = imutils.resize(move1, width=400, height = 400)
+move2Resize = imutils.resize(move2, width=400, height = 400)
+startResize = imutils.resize(start, width=400, height = 400)
+chessEngine  = ChessEng(board)
 
-#args =vars(ap.parse_args())
+#board.draw(emptyResize)
+move = board.determineChanges(startResize,move1Resize)
+#board.draw(startResize)
+#board.draw(move1Resize)
+chessEngine.updateMove(move)
+move = board.determineChanges(move1Resize,move2Resize)
+#board.draw(move2Resize)
 
-#image = cv2.imread(args["image"])
-#image2 = cv2.imread(args["image2"])
-image = cv2.imread('image1.jpg')
-image2 = cv2.imread('image2.jpg')
-	# Clean Image
-#Image_Analyzer = image_Prep(image)
-#cleanImage = Image_Analyzer.prepare_Image(image)
-
-
-	# Recognize Board
-boardRec = board_Recognition(image, image2)
-boardRec.initialize_Board(image,image2)
-
+chessEngine.updateMove(move)
 	#on start
 	#	take image
 	#	clean image

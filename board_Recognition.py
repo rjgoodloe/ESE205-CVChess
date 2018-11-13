@@ -4,19 +4,20 @@ import numpy as np
 import imutils
 from Line import Line
 from Square import Square
+from Board import Board
 
-debug =  True
+debug =  False
 
 
 class board_Recognition:
 
-	def __init__(self, image,image2):
+	def __init__(self, image):
 
 		self.image = image
-		self.image2 = imutils.resize(image2, width=600)
+#		self.image2 = imutils.resize(image2, width=600)
 
 
-	def initialize_Board(self, image, image2):
+	def initialize_Board(self, image):
 
 		adaptiveThresh,img = self.clean_Image(image)
 
@@ -29,15 +30,17 @@ class board_Recognition:
 		corners = self.findCorners(horizontal, vertical, colorEdges)
 
 		# find squares
-		squares = self.findSquares(corners, img, image2)
+		squares = self.findSquares(corners, img)
 
-		#board = Board.makeBoard(squares)
-		# create board
-		#return board
+		boardMatrix = []
+
+		board = Board(squares, boardMatrix)
+
+		return board
 
 	def clean_Image(self,image):
 		# resize image for simpler and quicker analysis
-		img = imutils.resize(image, width=600)
+		img = imutils.resize(image, width=400, height = 400)
 
 		# Smooth image to remove noise
 		img = cv2.GaussianBlur(img,(5,5),0)
@@ -145,8 +148,8 @@ class board_Recognition:
 
 		# Draw lines
 		a,b,c = lines.shape
-#		for i in range(a):
-#			cv2.line(colorEdges, (lines[i][0][0], lines[i][0][1]), (lines[i][0][2], lines[i][0][3]), (0,255,0),2,cv2.LINE_AA)
+		for i in range(a):
+			cv2.line(colorEdges, (lines[i][0][0], lines[i][0][1]), (lines[i][0][2], lines[i][0][3]), (0,255,0),2,cv2.LINE_AA)
 
 		if  debug:
 			# Show image with lines drawn
@@ -202,7 +205,7 @@ class board_Recognition:
 
 		return dedupeCorners
 
-	def findSquares(self, corners, colorEdges, image2):
+	def findSquares(self, corners, colorEdges):
 
 		corners.sort(key=lambda x: x[0])
 		rows = [[],[],[],[],[],[],[],[],[]]
@@ -225,23 +228,20 @@ class board_Recognition:
 				c3 = rows[r + 1][c]
 				c4 = rows[r + 1][c + 1]
 
-				position = letters[r] + numbers[c]
+				position = letters[r] + numbers[7-c]
 				newSquare = Square(colorEdges,c1,c2,c3,c4,position)
-				newSquare.draw(colorEdges,(0,0,255),2)
-				#newSquare.drawROI(colorEdges,(0,0,255),10)
-				newSquare.classify(colorEdges)
+#				newSquare.draw(colorEdges,(0,0,255),2)
 				Squares.append(newSquare)
-				#print(newSquare.roiColor(colorEdges))
-		for s in Squares:
-			s.classify(self.image2)
 
 
-		if debug:
+
+#		if debug:
+
                         #Show image with corners circled
-			cv2.imshow("Squares",colorEdges)
-			cv2.imshow("Diff",self.image2)
-			cv2.waitKey(0)
-			cv2.destroyAllWindows()
-			cv2.imwrite("Squares.png",colorEdges)
-			cv2.imwrite("PieceDetect.png",self.image2)
+			#cv2.imshow("Squares", colorEdges)
+			#cv2.waitKey(0)
+			#cv2.destroyAllWindows()
+			#cv2.imwrite("Squares.png",colorEdges)
 
+
+		return Squares

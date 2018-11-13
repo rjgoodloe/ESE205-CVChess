@@ -4,7 +4,7 @@ import math
 
 class Square:
 
-	def __init__(self, image, c1, c2, c3, c4, position):
+	def __init__(self, image, c1, c2, c3, c4, position, state=''):
 
 		# Corners
 		self.c1 = c1
@@ -22,17 +22,20 @@ class Square:
 		M = cv2.moments(self.contour)
 		cx = int(M['m10'] / M['m00'])
 		cy = int(M['m01'] / M['m00'])
+
 		# ROI for image differencing
 		self.roi = (cx, cy)
-		self.radius = 15
+		self.radius = 12
 
 		self.emptyColor = self.roiColor(image)
 
-	def draw(self, image, color=(0,0,255),thickness=2):
+		self.state = state
+
+	def draw(self, image, color,thickness=2):
 
 		# Formattign npArray of corners for drawContours
 		ctr = np.array(self.contour).reshape((-1,1,2)).astype(np.int32)
-		cv2.drawContours(image, [ctr], 0, (0,0,255), 3)
+		cv2.drawContours(image, [ctr], 0, color, 3)
 
 	def drawROI(self, image, color, thickness = 1):
 
@@ -55,13 +58,15 @@ class Square:
 
 		rgb = self.roiColor(image)
 
+		sum = 0
 		for i in range(0,3):
-			sum = (self.emptyColor[i] - rgb[i])**2
+			sum += (self.emptyColor[i] - rgb[i])**2
 
-		distance = math.sqrt(sum)
 
-		if distance > 40:
-			print("Square is occupied:" + self.position)
-			#cv2.circle(image, self.roi,self.radius,(0,0,255),2)
-			self.drawROI(image,(0,0,255),1)
+		cv2.putText(image, self.state,self.roi,cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,255,0),1,cv2.LINE_AA)
+#		distance = math.sqrt(sum)
+
+##		if distance > 40:
+#			print("Square is occupied:" + self.position)
+#			self.drawROI(image,(0,255,0),2)
 
