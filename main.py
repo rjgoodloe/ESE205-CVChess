@@ -10,17 +10,48 @@ from Camera import Camera
 #Take picture of board initially empty
 #camera = Camera()
 #image = camera.takePicture()
+class Game:
+#empty = cv2.imread("newEmpty.jpg")
+#end = cv2.imread("end.jpg")
+#move1 = cv2.imread("move1.jpg")
+#move2 = cv2.imread("move2.jpg")
+#start = cv2.imread("start.jpg")
+	def __init__(self):
+		pass
 
-empty = cv2.imread("newEmpty.jpg")
-end = cv2.imread("end.jpg")
-move1 = cv2.imread("move1.jpg")
-move2 = cv2.imread("move2.jpg")
-start = cv2.imread("start.jpg")
+	def setUp(self):
+		self.camera = Camera()
+		self.chessEngine = ChessEng(0)
+		self.board = 0
+		self.current = 0
+		self.previous = 0
+		print("Game Starting")
 
-# Take image and make squares and store empty color value
-boardRec = board_Recognition(empty)
-board = boardRec.initialize_Board(empty)
-board.assignState()
+	def analyzeBoard(self):
+
+		#self.current = self.camera.takePicture()
+		#boardRec = board_Recognition(self.current)
+		#self.board = boardRec.initialize_Board(self.current)
+		#board.assignState()
+		print("Analyzing board")
+
+	def checkBoardIsSet(self):
+		print("Board is set")
+
+	def playerMove(self):
+
+		#self.previous = self.current
+		#self.current = self.camera.takePicture()
+		#move = self.board.determineChanges(self.previous,self.current)
+		#self.chessEngine.updateMove(move)
+		print("Player move")
+
+	def CPUMove(self):
+
+		print("CPU Move")
+		move = self.chessEngine.feedToAI()
+		return move
+
 # prompt fill board with pieces
 # on button click -> begin game
 # previous = camera.takePicture()
@@ -40,22 +71,22 @@ board.assignState()
 #	previous = current
 
 
-emptyResize = imutils.resize(empty, width=400, height = 400)
-endResize = imutils.resize(end, width=400, height = 400)
-move1Resize = imutils.resize(move1, width=400, height = 400)
-move2Resize = imutils.resize(move2, width=400, height = 400)
-startResize = imutils.resize(start, width=400, height = 400)
-chessEngine  = ChessEng(board)
+#emptyResize = imutils.resize(empty, width=400, height = 400)
+#endResize = imutils.resize(end, width=400, height = 400)
+#move1Resize = imutils.resize(move1, width=400, height = 400)
+#move2Resize = imutils.resize(move2, width=400, height = 400)
+#startResize = imutils.resize(start, width=400, height = 400)
+#chessEngine  = ChessEng(board)
 
 #board.draw(emptyResize)
-move = board.determineChanges(startResize,move1Resize)
+#move = board.determineChanges(startResize,move1Resize)
 #board.draw(startResize)
 #board.draw(move1Resize)
-chessEngine.updateMove(move)
-move = board.determineChanges(move1Resize,move2Resize)
+#chessEngine.updateMove(move)
+#move = board.determineChanges(move1Resize,move2Resize)
 #board.draw(move2Resize)
 
-chessEngine.updateMove(move)
+#chessEngine.updateMove(move)
 	#on start
 	#	take image
 	#	clean image

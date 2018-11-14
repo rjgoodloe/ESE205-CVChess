@@ -49,3 +49,4 @@ class ChessEng:
 
 		self.engBoard.push(bestMove)
 		print(self.engBoard)
+		return bestMove
