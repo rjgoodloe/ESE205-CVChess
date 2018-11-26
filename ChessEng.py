@@ -16,7 +16,7 @@ class ChessEng:
 
 		uciMove = chess.Move.from_uci(move)
 		if uciMove not in self.engBoard.legal_moves:
-			print("Error: Invalid Move")
+			print("Error: Invalid move")
 		else:
 			self.engBoard.push(uciMove)
 			#self.checkCircumstances()
@@ -25,18 +25,16 @@ class ChessEng:
 
 	def checkCircumstances(self):
 
-		gameOver = False
+
 		if self.engBoard.is_check() and not self.engBoard.is_checkmate():
 			print("check")
-		if self.engBoard.is_game_over():
-			if self.engBoard.is_checkmate():
-				print("Checkmate")
-				gameOver = True
-			elif self.engBoard.is_stalemate():
-				print("Stalemate")
-				gameOver = True
-
-		return gameOver
+			return "Check"
+		elif self.engBoard.is_checkmate():
+			print("Checkmate")
+			return "Checkmate"
+		elif self.engBoard.is_stalemate():
+			print("Stalemate")
+			return "Stalemate"
 
 	def feedToAI(self):
 

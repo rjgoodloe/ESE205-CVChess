@@ -4,7 +4,6 @@ from main import Game
 LARGE_FONT = ("Verdana", 12)
 
 game = Game()
-moves = ["e"]
 
 class Application(tk.Tk):
 
@@ -20,9 +19,13 @@ class Application(tk.Tk):
 
 		self.frames = {}
 		self.move = StringVar()
-		self.move.set("e2")
+		self.move.set( "e2")
+
+		self.circumstance = StringVar()
+		self.circumstance.set("none")
+
 		for F in (StartGamePage, InitializeBoardPage,SetBoardPage, ChooseColorPage,
-				CPUMovePage, PlayerMovePage):
+				CPUMovePage, PlayerMovePage, CheckPage):
 
 			frame = F(container, self)
 			self.frames[F] = frame
@@ -68,7 +71,7 @@ class ChooseColorPage(tk.Frame):
 		label.pack(pady = 10, padx = 10)
 
 		blackButton = tk.Button(self, text = "Black",
-					command = lambda : controller.show_frame(CPUMovePage))
+					command = lambda : [controller.show_frame(CPUMovePage),controller.move.set(game.CPUMove())])
 		blackButton.pack()
 
 		whiteButton = tk.Button(self, text = "White",
@@ -94,13 +97,9 @@ class PlayerMovePage(tk.Frame):
 		label = tk.Label(self,text = "Your Move", font = LARGE_FONT)
 		label.pack(pady = 10, padx = 10)
 		PlayerButton = tk.Button(self, text = "Done",
-						command = lambda :[ controller.show_frame(CPUMovePage),controller.move.set(game.CPUMove())])
+						command = lambda : [controller.show_frame(CPUMovePage),game.playerMove(),controller.move.set(game.CPUMove())])
 		PlayerButton.pack()
 
-def getMove():
-
-	move = game.CPUMove()
-	return move
 
 class CPUMovePage(tk.Frame):
 
@@ -111,15 +110,25 @@ class CPUMovePage(tk.Frame):
 		label.pack(pady = 10, padx = 10)
 		self.moveLabel = tk.Label(self, textvariable = controller.move, font = LARGE_FONT)
 		self.moveLabel.pack(pady = 10, padx = 10)
+		page = PlayerMovePage
+#		controller.circumstance.set(game.chessEngine.checkCircumstance())
+#		if controller.circumstance == "Check":
+#			page = CheckPage
 		CPUButton = tk.Button(self, text = "Done",
-						command = lambda : controller.show_frame(PlayerMovePage))
+						command = lambda : [controller.show_frame(page), game.updateCurrent(), game.board.determineChanges(game.previous, game.current)])
 		CPUButton.pack()
 
 
-def getMove():
-	pass
-	#controller.move.set(game.CPUMove())
+class CheckPage(tk.Frame):
 
+        def __init__(self,parent,controller):
+
+                tk.Frame.__init__(self,parent)
+                label = tk.Label(self,text = "You are in Check")
+                label.pack(pady = 10, padx = 10)
+                setBoardButton = tk.Button(self, text = "Proceed",
+                                                 command = lambda : controller.show_frame(PlayerMovePage()))
+                setBoardButton.pack()
 
 app = Application()
 app.mainloop()

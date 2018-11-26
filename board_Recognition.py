@@ -6,16 +6,15 @@ from Line import Line
 from Square import Square
 from Board import Board
 
-debug =  False
+debug =  True
 
 
 class board_Recognition:
 
-	def __init__(self, image):
+	def __init__(self, image, camera):
 
 		self.image = image
-#		self.image2 = imutils.resize(image2, width=600)
-
+		self.cam = camera
 
 	def initialize_Board(self, image):
 
@@ -43,21 +42,22 @@ class board_Recognition:
 		img = imutils.resize(image, width=400, height = 400)
 
 		# Smooth image to remove noise
-		img = cv2.GaussianBlur(img,(5,5),0)
-
-		if debug:
+#		img = cv2.bilateralFilter(img,5,15,15)
+#		img = cv2.GaussianBlur(img,(1,1),0)
+#
+#		if debug:
 			# Show smoothed image
-			cv2.imshow("blur",img)
-			cv2.waitKey(0)
-			cv2.destroyAllWindows()
-			cv2.imwrite("Blur.png",img)
+#			cv2.imshow("blur",img)
+#			cv2.waitKey(0)
+#			cv2.destroyAllWindows()
+#			cv2.imwrite("Blur.png",img)
 
 		# Convert to grayscale
 		gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 
 		# Setting all pixels above the threshold value to white and those below to black
 		# Adaptive thresholding is used to combat differences of illumination in the picture
-		adaptiveThresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 115, 1)
+		adaptiveThresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 125, 1)
 		if debug:
 			# Show thresholded image
 			cv2.imshow("Adaptive Thresholding", adaptiveThresh)
@@ -207,6 +207,11 @@ class board_Recognition:
 
 	def findSquares(self, corners, colorEdges):
 
+		if len(corners)  < 81:
+			print("Try Again")
+#			newPic = self.cam.takePicture()
+#			self.initialize_Board(newPic)
+
 		corners.sort(key=lambda x: x[0])
 		rows = [[],[],[],[],[],[],[],[],[]]
 		r = 0
@@ -230,18 +235,20 @@ class board_Recognition:
 
 				position = letters[r] + numbers[7-c]
 				newSquare = Square(colorEdges,c1,c2,c3,c4,position)
-#				newSquare.draw(colorEdges,(0,0,255),2)
+				newSquare.draw(colorEdges,(0,0,255),2)
+				newSquare.drawROI(colorEdges,(255,0,0),2)
+				newSquare.classify(colorEdges)
 				Squares.append(newSquare)
 
 
 
-#		if debug:
+		if debug:
 
                         #Show image with corners circled
-			#cv2.imshow("Squares", colorEdges)
-			#cv2.waitKey(0)
-			#cv2.destroyAllWindows()
-			#cv2.imwrite("Squares.png",colorEdges)
+			cv2.imshow("Squares", colorEdges)
+			cv2.waitKey(0)
+			cv2.destroyAllWindows()
+			cv2.imwrite("Squares.png",colorEdges)
 
 
 		return Squares

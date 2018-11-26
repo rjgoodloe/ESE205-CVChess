@@ -25,7 +25,7 @@ class Square:
 
 		# ROI for image differencing
 		self.roi = (cx, cy)
-		self.radius = 12
+		self.radius = 7
 
 		self.emptyColor = self.roiColor(image)
 
@@ -63,10 +63,5 @@ class Square:
 			sum += (self.emptyColor[i] - rgb[i])**2
 
 
-		cv2.putText(image, self.state,self.roi,cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,255,0),1,cv2.LINE_AA)
-#		distance = math.sqrt(sum)
-
-##		if distance > 40:
-#			print("Square is occupied:" + self.position)
-#			self.drawROI(image,(0,255,0),2)
+		cv2.putText(image, self.position,self.roi,cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,255,0),1,cv2.LINE_AA)
 

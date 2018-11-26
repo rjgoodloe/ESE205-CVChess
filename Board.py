@@ -41,9 +41,12 @@ class Board:
 
 	def determineChanges(self,previous, current):
 
+		copy = current.copy()
+		largestSquare = 0
+		secondLargestSquare = 0
+		largestDist = 0
+		secondLargestDist = 0
 		stateChange = []
-		largest = 0
-		secondLargest = 0
 		# check for differences in color between the photos
 		for sq in self.squares:
 			colorPrevious = sq.roiColor(previous)
@@ -54,66 +57,94 @@ class Board:
 				sum += (colorCurrent[i] - colorPrevious[i])**2
 
 			distance = math.sqrt(sum)
-			if distance > secondLargest:
-				if distance > largest:
-					secondLargest = largest
-					largest = distance
-					stateChange.insert(0,sq)
-				else:
-					secondLargest = distance
-					stateChange.insert(0,sq)
+			if distance > 30:
+				stateChange.append(sq)
+			if distance > largestDist:
+				secondLargestSquare = largestSquare
+				secondLargestDist = largestDist
+				largestDist = distance
+				largestSquare = sq
 
-		squareOne = stateChange[0]
-		squareTwo = stateChange[1]
+			elif distance > secondLargestDist:
+				secondLargestDist = distance
+				secondLargestSquare = sq
+
+
+		if  len(stateChange) == 4:
+			print("castling")
+			squareOne = stateChange[0]
+			squareTwo = stateChange[1]
+			squareThree = stateChange[2]
+			squareFour = stateChange[3]
+			if squareOne.position == "e1" or squareTwo.position == "e1" or squareThree.position == "e1" or  squareFour.position == "e1":
+				if squareOne.position == "h1"  or squareTwo.position == "h1" or squareThree.position == "h1"  or squareFour.position == "h1":
+					move = "e1g1"
+					if debug:
+						squareOne.draw(copy, (255,0,0), 2)
+						squareTwo.draw(copy, (255,0,0), 2)
+						squareThree.draw(copy, (255,0,0),2)
+						squareFour.draw(copy, (255,0,0), 2)
+						cv2.imshow("previous",previous)
+						cv2.imshow("identified",copy)
+						cv2.waitKey()
+						cv2.imwrite("Identify.png",copy)
+						cv2.imwrite("Previous.png",previous)
+						cv2.destroyAllWindows()
+				else:
+					move = "e1c1"
+					if debug:
+						squareOne.draw(copy, (255,0,0), 2)
+						squareTwo.draw(copy, (255,0,0), 2)
+						squareThree.draw(copy, (255,0,0),2)
+						squareFour.draw(copy, (255,0,0), 2)
+						cv2.imshow("previous",previous)
+						cv2.imshow("identified",copy)
+						cv2.waitKey()
+						cv2.imwrite("Identify.png",copy)
+						cv2.imwrite("Previous.png",previous)
+						cv2.destroyAllWindows()
+				print(move)
+				return move
+
+
+		squareOne = largestSquare
+		squareTwo = secondLargestSquare
 
 		if debug:
-#			squareOne.draw(current, (255,0,0), 2)
-#			squareTwo.draw(current, (255,0,0), 2)
+			squareOne.draw(copy, (255,0,0), 2)
+			squareTwo.draw(copy, (255,0,0), 2)
 			cv2.imshow("previous",previous)
-			cv2.imshow("identified",current)
+			cv2.imshow("identified",copy)
 			cv2.waitKey(0)
-			cv2.imwrite("Identify.png",current)
+			cv2.imwrite("Identify.png",copy)
 			cv2.imwrite("Previous.png",previous)
 			cv2.destroyAllWindows()
 
 		# get colors for each square from each photo
-		#onePrev = squareOne.roiColor(previous)
 		oneCurr = squareOne.roiColor(current)
-		#twoPrev = squareTwo.roiColor(previous)
 		twoCurr = squareTwo.roiColor(current)
 
 		sumCurr1 = 0
 		sumCurr2 = 0
 		for i in range(0,3):
-			#sumPrev1 += (onePrev[i] - squareOne.emptyColor[i])**2
 			sumCurr1 += (oneCurr[i] - squareOne.emptyColor[i])**2
-			#sumPrev2 += (twoPrev[i] - squareTwo.emptyColor[i])**2
 			sumCurr2 += (twoCurr[i] - squareTwo.emptyColor[i])**2
 
-		#distPrev1 = math.sqrt(sumPrev1)
 		distCurr1 = math.sqrt(sumCurr1)
-		#distPrev2 = math.sqrt(sumPrev2)
 		distCurr2 = math.sqrt(sumCurr2)
-		attack = False
-		#if squareOne.state != '.' and squareTwo.state != '.':
-		#	attack = True
 
 		if distCurr1 < distCurr2:
 			# square 1 is currently empty
 			squareTwo.state = squareOne.state
 			squareOne.state = '.'
-			if attack:
-				move = squareOne.position + 'x' + squareTwo.position
-			else:
-				move = squareOne.position + squareTwo.position
+
+			move = squareOne.position + squareTwo.position
 		else:
 			# square 2 is currently empty
 			squareOne.state = squareTwo.state
 			squareTwo.state = '.'
-			if attack:
-				move = squareTwo.position + 'x' + squareOne.position
-			else:
-				move = squareTwo.position + squareOne.position
+
+			move = squareTwo.position + squareOne.position
 
 		print(move)
 		return move
