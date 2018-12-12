@@ -11,47 +11,39 @@ debug =  True
 
 class board_Recognition:
 
-	def __init__(self, image, camera):
+	def __init__(self, camera):
 
-		self.image = image
 		self.cam = camera
 
-	def initialize_Board(self, image):
+	def initialize_Board(self):
 
-		adaptiveThresh,img = self.clean_Image(image)
+		corners = []
 
-		mask = self.initialize_mask(adaptiveThresh,img)
+		while len(corners) < 81:
 
-		edges,colorEdges = self.findEdges(mask)
+			image = self.cam.takePicture()
 
-		horizontal, vertical = self.findLines(edges,colorEdges)
+			adaptiveThresh,img = self.clean_Image(image)
 
-		corners = self.findCorners(horizontal, vertical, colorEdges)
+			mask = self.initialize_mask(adaptiveThresh,img)
+
+			edges,colorEdges = self.findEdges(mask)
+
+			horizontal, vertical = self.findLines(edges,colorEdges)
+
+			corners = self.findCorners(horizontal, vertical, colorEdges)
 
 		# find squares
 		squares = self.findSquares(corners, img)
 
-		boardMatrix = []
-
-		board = Board(squares, boardMatrix)
+		board = Board(squares)
 
 		return board
 
 	def clean_Image(self,image):
 		# resize image for simpler and quicker analysis
 		img = imutils.resize(image, width=400, height = 400)
-
-		# Smooth image to remove noise
-#		img = cv2.bilateralFilter(img,5,15,15)
-#		img = cv2.GaussianBlur(img,(1,1),0)
-#
-#		if debug:
-			# Show smoothed image
-#			cv2.imshow("blur",img)
-#			cv2.waitKey(0)
-#			cv2.destroyAllWindows()
-#			cv2.imwrite("Blur.png",img)
-
+		
 		# Convert to grayscale
 		gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 
@@ -63,7 +55,6 @@ class board_Recognition:
 			cv2.imshow("Adaptive Thresholding", adaptiveThresh)
 			cv2.waitKey(0)
 			cv2.destroyAllWindows()
-			cv2.imwrite("Adaptive_Thresholding.png",adaptiveThresh)
 
 		return adaptiveThresh,img
 
@@ -101,7 +92,6 @@ class board_Recognition:
 			# Show image with contours drawn
 			cv2.imshow("Chess Boarder",imgContours)
 			cv2.waitKey(0)
-			cv2.imwrite("Boarder.png",imgContours)
 			cv2.destroyAllWindows()
 
 		# Epsilon parameter needed to fit contour to polygon
@@ -124,7 +114,6 @@ class board_Recognition:
 			cv2.imshow("mask",extracted)
 			cv2.waitKey(0)
 			cv2.destroyAllWindows()
-			cv2.imwrite("Mask.png",extracted)
 		return extracted
 
 	def findEdges(self, image):
@@ -135,7 +124,6 @@ class board_Recognition:
 			cv2.imshow("Canny", edges)
 			cv2.waitKey(0)
 			cv2.destroyAllWindows()
-			cv2.imwrite("Edges.png",edges)
 
 		# Convert edges image to grayscale
 		colorEdges = cv2.cvtColor(edges,cv2.COLOR_GRAY2BGR)
@@ -156,7 +144,6 @@ class board_Recognition:
 			cv2.imshow("Lines",colorEdges)
 			cv2.waitKey(0)
 			cv2.destroyAllWindows()
-			cv2.imwrite("Lines.png",colorEdges)
 
 		# Create line objects and sort them by orientation (horizontal or vertical)
 		horizontal = []
@@ -180,6 +167,7 @@ class board_Recognition:
 				s1,s2 = v.find_intersection(h)
 				corners.append([s1,s2])
 
+		# remove duplicate corners
 		dedupeCorners = []
 		for c in corners:
 			matchingFlag = False
@@ -199,18 +187,10 @@ class board_Recognition:
 			cv2.imshow("Corners",colorEdges)
 			cv2.waitKey(0)
 			cv2.destroyAllWindows()
-			cv2.imwrite("Corners.png",colorEdges)
-
-
 
 		return dedupeCorners
 
 	def findSquares(self, corners, colorEdges):
-
-		if len(corners)  < 81:
-			print("Try Again")
-#			newPic = self.cam.takePicture()
-#			self.initialize_Board(newPic)
 
 		corners.sort(key=lambda x: x[0])
 		rows = [[],[],[],[],[],[],[],[],[]]
@@ -243,12 +223,9 @@ class board_Recognition:
 
 
 		if debug:
-
-                        #Show image with corners circled
+			#Show image with corners circled
 			cv2.imshow("Squares", colorEdges)
 			cv2.waitKey(0)
 			cv2.destroyAllWindows()
-			cv2.imwrite("Squares.png",colorEdges)
-
 
 		return Squares
