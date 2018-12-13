@@ -5,80 +5,61 @@ import stockfish
 from Board import Board
 
 class ChessEng:
+	'''
+	This class interacts with the stockfish chess engine using the python-chess
+	package. All interactions are done with the Universal Chess Interface protocol (UCI)
+	Transcribes game to a txt file called Game.txt
+	'''
 
-	def __init__(self, realBoard):
+	def __init__(self):
+		'''
+		Creates chessboard, local chess engine stockfish, and initiates UCI protocol
+		'''
 
 		self.engBoard = chess.Board()
 		self.engine = chess.uci.popen_engine("/usr/games/stockfish")
 		self.engine.uci()
-		#self.engine.setoption({'Skill Level' : 0})
-		#print(self.engine.options)
 		print(self.engBoard)
 
 	def updateMove(self, move):
+		'''
+		Updates chess board with the move made. Also checks for illegal moves
+		'''
 
+		# convert move to UCI format for engine
 		uciMove = chess.Move.from_uci(move)
+
+		# check legality
 		if uciMove not in self.engBoard.legal_moves:
 			return 1
 		else:
+			# update board
 			self.engBoard.push(uciMove)
 			print(self.engBoard)
 			return 0
 
 
 	def feedToAI(self):
+		'''
+		Gets the bestmove from the stockfish engine. Writes move choice to Game.txt file
+		'''
 
-
+		# giving the CPU the current board position
 		self.engine.position(self.engBoard)
+		
+		# Giving the engine 2000ms to produce a move 
 		response = self.engine.go(movetime=2000)
 		bestMove = response[0]
+		
+		# update board
 		self.engBoard.push(bestMove)
+		
+		# write move to txt file
 		f = open("Game.txt", "a+")
 		f.write(bestMove.uci()+ "\r\n")
 		f.close()
+		
 		print(self.engBoard)
 		return bestMove
-
-
-
-
-#	def setdif(self, value)
-
-#		if value == 1
-#		self.engine.setoption Skill Level 0
-#			print("Easy")
-#			return self.engine
-#		elif value == 2
-#		self.engine.setoption Skill Level 5
-#			print("Itermediate")
-#			return self.engine
-#		elif value == 3
-#		self.engine.setoption Skill Level 10
-#			print("Hard")
-#			return self.engine
-#		elif value == 4
-#		self.engine.setoption Skill Level 15
-#			print("Extreme")
-#			return self.engine
-#		elif value == 5
-#		self.engine.setoption Skill Level 20
-#			print("Master")
-#			return self.engine
-#		return self.engine.setoption Skill Level value
-
-
-
-#	def difconv(self. text)
-#
-#		if text == "Easy"
-#			return 1
-#		elif text == "Intermediate"
-#			return 2
-#		elif text == "Hard"
-#			return 3
-#		elif text == "Extreme"
-#			return 4
-#		elif text == "Master"
-#			return 5
 
 

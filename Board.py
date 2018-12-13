@@ -2,12 +2,12 @@ import cv2
 import numpy as np
 import math
 
-debug = True
+debug = False
 
 
 class Board:
 	"""
-	Holds all the Square instances and updates changes
+	Holds all the Square instances and updates changes to board after moves
 	"""
 	def __init__(self, squares):
 
@@ -46,6 +46,10 @@ class Board:
 			self.boardMatrix.append(square.state)
 
 	def determineChanges(self,previous, current):
+		'''
+		Determines the change in color values within squares from picture to picture
+		to infer piece movement
+		'''
 
 		copy = current.copy()
 		
@@ -146,7 +150,7 @@ class Board:
 							return self.move
 
 				
-					# Black long side castle
+				# Black long side castle
 				if squareOne.position == "d8"  or squareTwo.position == "d8" or squareThree.position == "d8"  or squareFour.position == "d8":
 					if squareOne.position == "c8"  or squareTwo.position == "c8" or squareThree.position == "c8"  or squareFour.position == "c8":
 						if squareOne.position == "a8"  or squareTwo.position == "a8" or squareThree.position == "a8"  or squareFour.position == "a8":
@@ -194,17 +198,12 @@ class Board:
 			# square 1 is closer to empty color value thus empty
 			squareTwo.state = squareOne.state
 			squareOne.state = '.'
-			#print(squareTwo.state.lower())
-			#print(squareTwo.position[1:2])
-			#if squareTwo.state.lower() == 'p':
-			#	if squareOne.position[1:2] == '2' and squareTwo.position[1:2] == '1':
-			#		self.promo = True
-					#move = squareOne.position + squareTwo.position + self.promotion
-					#return move
-			#	if squareOne.position[1:2] == '7' and squareTwo.position[1:2] == '8':
-			#		self.promo = True
-					#move = squareOne.position + squareTwo.position + self.promotion
-					#return move
+			# check for promotion of a pawn
+			if squareTwo.state.lower() == 'p':
+				if squareOne.position[1:2] == '2' and squareTwo.position[1:2] == '1':
+					self.promo = True
+				if squareOne.position[1:2] == '7' and squareTwo.position[1:2] == '8':
+					self.promo = True
 
 			self.move = squareOne.position + squareTwo.position
 
@@ -212,17 +211,13 @@ class Board:
 			# square 2 is currently empty
 			squareOne.state = squareTwo.state
 			squareTwo.state = '.'
-			#print(squareOne.state.lower())
-			#print(squareOne.position[1:2])
-			#if squareOne.state.lower() == 'p':
-			#	if squareOne.position[1:2] == '1' and squareTwo.position[1:2] == '2':
-			#		self.promo = True
-					#move = squareTwo.position + squareOne.position
-					#return move
-			#	if squareOne.position[1:2] == '8' and squareTwo.position[1:2] == '7':
-			#		self.promo = True
-					#move = squareTwo.position + squareOne.position + self.promotion
-					#return move
+			# check pawn promotion
+			if squareOne.state.lower() == 'p':
+				if squareOne.position[1:2] == '1' and squareTwo.position[1:2] == '2':
+					self.promo = True
+				if squareOne.position[1:2] == '8' and squareTwo.position[1:2] == '7':
+					self.promo = True
+
 					
 			self.move = squareTwo.position + squareOne.position
 

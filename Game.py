@@ -9,12 +9,13 @@ from Camera import Camera
 
 class Game:
 	'''
-	This calss holds Game information interacting with the Board and Chess Engine
+	This class holds Game information interacting with the Board and Chess Engine
 	'''
 
 	def __init__(self):
 		'''
-		Initializes Game object	
+		Initializes Game object	and creates several boolean values regarding game's status
+		Sets game winner as place holder
 		'''
 		self.over = False
 		self.CPUMoveError = False
@@ -27,7 +28,7 @@ class Game:
 		Initializes objects with which the Game will interact
 		'''	
 		self.camera = Camera()
-		self.chessEngine = ChessEng(0)
+		self.chessEngine = ChessEng()
 		self.board = 0
 		self.current = 0
 		self.previous = 0
@@ -59,12 +60,15 @@ class Game:
 		move = self.board.determineChanges(self.previous,self.current)
 		code = self.chessEngine.updateMove(move)
 		if code == 1:
+			# illegal move prompt GUI to open Player Move Error Page
 			self.PlayerMoveError = True
 		else:
 			self.PlayerMoveError = False
+			# write to Game.txt file
 			f = open("Game.txt", "a+")
 			f.write(chess.Move.from_uci(move).uci() + "\r\n")
 			f.close()
+		# check for Game Over
 		if  self.chessEngine.engBoard.is_checkmate():
 			self.winner = "You win!"
 			self.over = True
@@ -73,16 +77,22 @@ class Game:
 		'''
 		Compares previous Board to current board to determine the movement made by the player
 		'''
+		
 		print(move)
 		code = self.chessEngine.updateMove(move)
 		if code == 1:
+			# illegal move prompt GUI to open PlayerMoveError Page
 			print("Error")
 			self.PlayerMoveError = True
 		else:
 			self.PlayerMoveError = False
+			
+			# write to Game.txt file
 			f = open("Game.txt", "a+")
 			f.write(chess.Move.from_uci(move).uci() + "\r\n")
 			f.close()
+
+		# check Game Over
 		if  self.chessEngine.engBoard.is_checkmate():
 			self.winner = "You win!"
 			self.over = True
@@ -93,11 +103,17 @@ class Game:
 		Gets the CPU Move from the chess engine
 		'''	
 
+		# get move from chess engine
 		self.CPULastMove = self.chessEngine.feedToAI()
-		self.isCheck = self.chessEngine.engBoard.is_check()		
+
+		# if check GUI will open Check Window alerting user
+		self.isCheck = self.chessEngine.engBoard.is_check()	
+
+		# Check Game Over
 		if self.chessEngine.engBoard.is_checkmate():
 			self.winner = "CPU Wins!"
 			self.over = True
+
 		return self.CPULastMove
 
 	def updateCurrent(self):
@@ -107,9 +123,14 @@ class Game:
 		'''
 		self.previous = self.current
 		self.current = self.camera.takePicture()
+
+		# determine move
 		move = self.board.determineChanges(self.previous, self.current)
 		move = chess.Move.from_uci(move)
+
+		# Ensure player has moved the CPU piece properly
 		if move == self.CPULastMove:
 			self.CPUMoveError = False
 		else:
+			# GUI will open CPUMoveError Page
 			self.CPUMoveError = True

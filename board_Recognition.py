@@ -6,10 +6,14 @@ from Line import Line
 from Square import Square
 from Board import Board
 
-debug =  True
+debug =  False
 
 
 class board_Recognition:
+	'''
+	This class handles the initialization of the board. It analyzes
+	the empty board finding its border, lines, corners, squares...
+	'''
 
 	def __init__(self, camera):
 
@@ -19,29 +23,39 @@ class board_Recognition:
 
 		corners = []
 
+		# retake picture until board is initialized properly
 		while len(corners) < 81:
 
 			image = self.cam.takePicture()
 
+			# Binarize the photo
 			adaptiveThresh,img = self.clean_Image(image)
 
+			# Black out all pixels outside the border of the chessboard
 			mask = self.initialize_mask(adaptiveThresh,img)
 
+			# Find edges
 			edges,colorEdges = self.findEdges(mask)
 
+			# Find lines
 			horizontal, vertical = self.findLines(edges,colorEdges)
 
+			# Find corners
 			corners = self.findCorners(horizontal, vertical, colorEdges)
 
-		# find squares
+		# Find squares
 		squares = self.findSquares(corners, img)
 
+		# create Board
 		board = Board(squares)
 
 		return board
 
 	def clean_Image(self,image):
-		# resize image for simpler and quicker analysis
+		'''
+		Resizes and converts the photo to black and white for simpler analysis
+		'''
+		# resize image
 		img = imutils.resize(image, width=400, height = 400)
 		
 		# Convert to grayscale
@@ -59,6 +73,9 @@ class board_Recognition:
 		return adaptiveThresh,img
 
 	def initialize_mask(self, adaptiveThresh,img):
+		'''
+		Finds border of chessboard and blacks out all unneeded pixels
+		'''
 
 		# Find contours (closed polygons)
 		_, contours, hierarchy = cv2.findContours(adaptiveThresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -117,6 +134,10 @@ class board_Recognition:
 		return extracted
 
 	def findEdges(self, image):
+		'''
+		Finds edges in the image. Edges later used to find lines and so on
+		'''
+	
 		# Find edges
 		edges = cv2.Canny(image, 100, 200, None, 3)
 		if debug:
@@ -131,6 +152,10 @@ class board_Recognition:
 		return edges,colorEdges
 
 	def findLines (self, edges, colorEdges):
+		'''
+		Finds the lines in the photo and sorts into vertical and horizontal
+		'''
+		
 		# Infer lines based on edges
 		lines = cv2.HoughLinesP(edges, 1,  np.pi / 180, 100,np.array([]), 100, 80)
 
@@ -159,6 +184,9 @@ class board_Recognition:
 		return horizontal, vertical
 
 	def findCorners (self, horizontal, vertical, colorEdges):
+		'''
+		Finds corners at intersection of horizontal and vertical lines.
+		'''
 
 		# Find corners (intersections of lines)
 		corners = []
@@ -191,7 +219,11 @@ class board_Recognition:
 		return dedupeCorners
 
 	def findSquares(self, corners, colorEdges):
+		'''
+		Finds the squares of the chessboard 
+		'''
 
+		# sort corners by row
 		corners.sort(key=lambda x: x[0])
 		rows = [[],[],[],[],[],[],[],[],[]]
 		r = 0
@@ -204,8 +236,12 @@ class board_Recognition:
 		letters = ['a','b','c','d','e','f','g','h']
 		numbers = ['1','2','3','4','5','6','7','8']
 		Squares = []
+		
+		# sort corners by column
 		for r in rows:
 			r.sort(key=lambda y: y[1])
+		
+		# initialize squares
 		for r in range(0,8):
 			for c in range (0,8):
 				c1 = rows[r][c]
@@ -223,7 +259,7 @@ class board_Recognition:
 
 
 		if debug:
-			#Show image with corners circled
+			#Show image with squares and ROI drawn and position labelled
 			cv2.imshow("Squares", colorEdges)
 			cv2.waitKey(0)
 			cv2.destroyAllWindows()
