@@ -1,3 +1,4 @@
+# part of https://github.com/WolfgangFahl/ESE205-CVChess/
 import tkinter as tk
 from tkinter import *
 from Game import Game
@@ -431,8 +432,6 @@ class ChoosePromotionPage(tk.Frame):
 			controller.move.set(controller.game.CPUMove())
 			controller.show_frame(CPUMovePage)
 	
-
-
 
 app = Application()
 app.mainloop()

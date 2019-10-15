@@ -1,3 +1,4 @@
+# part of https://github.com/WolfgangFahl/ESE205-CVChess/
 import math
 import cv2
 import numpy as np
@@ -8,13 +9,14 @@ from Board import Board
 
 debug =  False
 
-
+# Chess Board recognition
 class board_Recognition:
 	'''
 	This class handles the initialization of the board. It analyzes
 	the empty board finding its border, lines, corners, squares...
 	'''
 
+        #  construct me
 	def __init__(self, camera):
 
 		self.cam = camera
