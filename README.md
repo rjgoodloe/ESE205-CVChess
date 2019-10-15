@@ -1,4 +1,9 @@
-"# ESE205-CVChess" 
+This is a for of the CVChess project 
+
+# Documentation
+[Wiki] (http://wiki.bitplan.com/index.php/Raspberry_PI_Chessboard)
+
+# ESE205-CVChess 
 
 ESE 205 Introduction to Engineering Design Project
 

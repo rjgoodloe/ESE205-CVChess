@@ -2,5 +2,10 @@
 # WF 2019-07-27
 # install pre requisites
 
+# check if stockfish is already installed
+if [ ! -f /usr/games/stockfish ]
+then
+  sudo apt-get install stockfish
+fi
 # install required modules
 sudo -H pip3 install -r requirements.txt
