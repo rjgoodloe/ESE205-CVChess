@@ -1,21 +1,20 @@
 # see https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_gui/py_video_display/py_video_display.html
-import numpy as np
+from Camera import Camera
 import cv2
 
-cap = cv2.VideoCapture(0)
+camera=Camera()
+Camera.debug=True
+
 
 while(True):
-    # Capture frame-by-frame
-    ret, frame = cap.read()
-
+    # get and display an image
+    image=camera.takePicture()
     # Our operations on the frame come here
     #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    # Display the resulting frame
-    cv2.imshow('Camera',frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
 # When everything done, release the capture
-cap.release()
+camera.close()
 cv2.destroyAllWindows()

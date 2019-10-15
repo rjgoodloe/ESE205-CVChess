@@ -53,3 +53,7 @@ class Camera:
 
 
     return resized
+
+  def close(self):
+    if self.webcam:
+      self.webcam.release()
