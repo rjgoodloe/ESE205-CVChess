@@ -1,0 +1,6 @@
+# 2019-10-14 WF
+imutils
+# https://gitmemory.com/issue/niklasf/python-chess/415/494897715
+python-chess==0.25.0
+stockfish
+opencv-python
