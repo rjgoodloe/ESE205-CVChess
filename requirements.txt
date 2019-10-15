@@ -4,3 +4,5 @@ imutils
 python-chess==0.25.0
 stockfish
 opencv-python
+# python tests
+pytest
