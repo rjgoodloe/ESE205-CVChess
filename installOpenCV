@@ -170,10 +170,11 @@ installRaspbianSource() {
 
 # https://github.com/pageauc/opencv3-setup/issues/3
 # https://raspberrypi.stackexchange.com/a/83682/11220
+# https://stackoverflow.com/a/53402396/1497139
 installRaspbian() {
   install="sudo apt-get install -y"
   $install libopencv-dev python3-opencv opencv-doc
-  $install libqtgui4 libqt4-test
+  $install libhdf5-dev libhdf5-serial-dev libatlas-base-dev libjasper-dev  libqtgui4  libqt4-test 
   $install python2.7-dev python3-dev
 }
 
