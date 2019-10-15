@@ -8,6 +8,7 @@ import imutils
 
 # camera access
 class Camera:
+  debug=False
 
   # construct me
   def __init__(self):
@@ -27,12 +28,16 @@ class Camera:
   # take a picture
   def takePicture(self):
     if self.picam:
-      return self.takePictureFromPiCam()
+      image=self.takePictureFromPiCam()
     elif self.webcam:
-      return self.webcam.read()
+      ret,image=self.webcam.read()
+      if not ret:
+        raise Exception('webcam image read failed')
     else:
       raise Exception('no camera available')
-      
+    if Camera.debug:
+      cv2.imshow('Camera',image)
+    return image
 
   def takePictureFromPiCam(self):
     # initialize the camera and grab a reference to the raw camera capture
