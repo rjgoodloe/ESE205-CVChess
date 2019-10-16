@@ -1,10 +1,11 @@
 # part of https://github.com/WolfgangFahl/ESE205-CVChess/
+from Image import Image
 import cv2
 import numpy as np
 import math
 
 
-
+# the Chess Board
 class Board:
   """
   Holds all the Square instances and updates changes to board after moves
@@ -109,10 +110,8 @@ class Board:
                 squareTwo.draw(copy, (255,0,0), 2)
                 squareThree.draw(copy, (255,0,0),2)
                 squareFour.draw(copy, (255,0,0), 2)
-                cv2.imshow("previous",previous)
-                cv2.imshow("identified",copy)
-                cv2.waitKey()
-                cv2.destroyAllWindows()
+                Image.show("previous",previous)
+                Image.show("identified",copy)
               return self.move        
                 
         # white long side castle
@@ -127,10 +126,8 @@ class Board:
                 squareTwo.draw(copy, (255,0,0), 2)
                 squareThree.draw(copy, (255,0,0),2)
                 squareFour.draw(copy, (255,0,0), 2)
-                cv2.imshow("previous",previous)
-                cv2.imshow("identified",copy)
-                cv2.waitKey()
-                cv2.destroyAllWindows()
+                Image.show("previous",previous)
+                Image.show("identified",copy)
               return self.move
 
       # check Black short side castle
@@ -145,10 +142,8 @@ class Board:
                 squareTwo.draw(copy, (255,0,0), 2)
                 squareThree.draw(copy, (255,0,0),2)
                 squareFour.draw(copy, (255,0,0), 2)
-                cv2.imshow("previous",previous)
-                cv2.imshow("identified",copy)
-                cv2.waitKey()
-                cv2.destroyAllWindows()
+                Image.show("previous",previous)
+                Image.show("identified",copy)
               return self.move
 
         
@@ -163,10 +158,8 @@ class Board:
                 squareTwo.draw(copy, (255,0,0), 2)
                 squareThree.draw(copy, (255,0,0),2)
                 squareFour.draw(copy, (255,0,0), 2)
-                cv2.imshow("previous",previous)
-                cv2.imshow("identified",copy)
-                cv2.waitKey()
-                cv2.destroyAllWindows()
+                Image.show("previous",previous)
+                Image.show("identified",copy)
               return self.move
         
 
@@ -177,10 +170,8 @@ class Board:
     if Board.debug:
       squareOne.draw(copy, (255,0,0), 2)
       squareTwo.draw(copy, (255,0,0), 2)
-      cv2.imshow("previous",previous)
-      cv2.imshow("identified",copy)
-      cv2.waitKey(0)
-      cv2.destroyAllWindows()
+      Image.show("previous",previous)
+      Image.show("identified",copy)
 
     # get colors for each square from each photo
     oneCurr = squareOne.roiColor(current)

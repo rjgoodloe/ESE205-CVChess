@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import *
 from Game import Game
 from Board import Board
+from board_Recognition import board_Recognition
 from Camera import Camera
 import argparse
 
@@ -27,6 +28,7 @@ class Application(tk.Tk):
     debug=args.debug
     Board.debug=debug
     Camera.debug=debug
+    board_Recognition.debug=debug
 
     container = tk.Frame(self)
 

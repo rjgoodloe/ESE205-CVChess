@@ -6,11 +6,13 @@ import imutils
 from Line import Line
 from Square import Square
 from Board import Board
+from Image import Image
 
-debug =  False
 
 # Chess Board recognition
 class board_Recognition:
+  debug =  False
+
   '''
   This class handles the initialization of the board. It analyzes
   the empty board finding its border, lines, corners, squares...
@@ -64,11 +66,9 @@ class board_Recognition:
     # Setting all pixels above the threshold value to white and those below to black
     # Adaptive thresholding is used to combat differences of illumination in the picture
     adaptiveThresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 125, 1)
-    if debug:
+    if board_Recognition.debug:
       # Show thresholded image
-      cv2.imshow("Adaptive Thresholding", adaptiveThresh)
-      cv2.waitKey(0)
-      cv2.destroyAllWindows()
+      Image.show("Adaptive Thresholding", adaptiveThresh)
 
     return adaptiveThresh,img
 
@@ -105,11 +105,9 @@ class board_Recognition:
 
     # Draw contours
     cv2.drawContours(imgContours, [largest], -1, (0,0,0), 1)
-    if debug:
+    if board_Recognition.debug:
       # Show image with contours drawn
-      cv2.imshow("Chess Boarder",imgContours)
-      cv2.waitKey(0)
-      cv2.destroyAllWindows()
+      Image.show("Chess Board Contours",imgContours)
 
     # Epsilon parameter needed to fit contour to polygon
     epsilon = 0.1 * Lperimeter
@@ -126,11 +124,9 @@ class board_Recognition:
     # remove strip around edge
     extracted[np.where((extracted == [125, 125, 125]).all(axis=2))] = [0, 0, 20]
 
-    if debug:
+    if board_Recognition.debug:
       # Show image with mask drawn
-      cv2.imshow("mask",extracted)
-      cv2.waitKey(0)
-      cv2.destroyAllWindows()
+      Image.show("mask",extracted)
     return extracted
 
   def findEdges(self, image):
@@ -140,11 +136,9 @@ class board_Recognition:
   
     # Find edges
     edges = cv2.Canny(image, 100, 200, None, 3)
-    if debug:
+    if board_Recognition.debug:
       #Show image with edges drawn
-      cv2.imshow("Canny", edges)
-      cv2.waitKey(0)
-      cv2.destroyAllWindows()
+      Image.show("Canny", edges)
 
     # Convert edges image to grayscale
     colorEdges = cv2.cvtColor(edges,cv2.COLOR_GRAY2BGR)
@@ -164,11 +158,9 @@ class board_Recognition:
     for i in range(a):
       cv2.line(colorEdges, (lines[i][0][0], lines[i][0][1]), (lines[i][0][2], lines[i][0][3]), (0,255,0),2,cv2.LINE_AA)
 
-    if  debug:
+    if  board_Recognition.debug:
       # Show image with lines drawn
-      cv2.imshow("Lines",colorEdges)
-      cv2.waitKey(0)
-      cv2.destroyAllWindows()
+      Image.show("Lines",colorEdges)
 
     # Create line objects and sort them by orientation (horizontal or vertical)
     horizontal = []
@@ -210,11 +202,9 @@ class board_Recognition:
       cv2.circle(colorEdges, (d[0],d[1]), 10, (0,0,255))
 
 
-    if debug:
+    if board_Recognition.debug:
       #Show image with corners circled
-      cv2.imshow("Corners",colorEdges)
-      cv2.waitKey(0)
-      cv2.destroyAllWindows()
+      Image.show("Corners",colorEdges)
 
     return dedupeCorners
 
@@ -256,12 +246,8 @@ class board_Recognition:
         newSquare.classify(colorEdges)
         Squares.append(newSquare)
 
-
-
-    if debug:
+    if board_Recognition.debug:
       #Show image with squares and ROI drawn and position labelled
-      cv2.imshow("Squares", colorEdges)
-      cv2.waitKey(0)
-      cv2.destroyAllWindows()
+      Image.show("Squares", colorEdges)
 
     return Squares
