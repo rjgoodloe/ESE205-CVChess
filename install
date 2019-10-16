@@ -3,7 +3,7 @@
 # install pre requisites
 
 # check for installed games
-for game in xboard stockfish
+for game in xboard stockfish polyglot
 do
   which $game > /dev/null
   if [ $? -ne 0 ]
