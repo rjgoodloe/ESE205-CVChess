@@ -1,0 +1,4 @@
+#!/bin/bash
+# uncomment to always debug
+#python3 ./OOPGUI.py --debug
+python3 ./OOPGUI.py $@ 

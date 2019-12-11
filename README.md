@@ -1,4 +1,9 @@
-"# ESE205-CVChess" 
+This is a fork of the CVChess project for comparison with the PlayChessWithAWebCam approach
+
+# Documentation
+[Wiki] (http://wiki.bitplan.com/index.php/PlayChessWithAWebCam)
+
+# ESE205-CVChess
 
 ESE 205 Introduction to Engineering Design Project
 

@@ -1,0 +1,15 @@
+#!/bin/bash
+# WF 2019-07-27
+# install pre requisites
+
+# check for installed games
+for game in xboard stockfish polyglot
+do
+  which $game > /dev/null
+  if [ $? -ne 0 ]
+  then
+    sudo apt-get install $game 
+  fi
+done
+# install required modules
+sudo -H pip3 install -r requirements.txt

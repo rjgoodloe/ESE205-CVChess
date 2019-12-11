@@ -1,6 +1,6 @@
+# part of https://github.com/WolfgangFahl/ESE205-CVChess/
 import imutils
 import cv2
-import argparse
 import chess
 from ChessEng import ChessEng
 from board_Recognition import board_Recognition

@@ -1,0 +1,6 @@
+# Logs
+Game.txt
+# Python cache
+__pycache__
+# vim swap files
+*.sw*

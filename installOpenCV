@@ -1,0 +1,297 @@
+#!/bin/bash
+# WF 2019-06-25
+# Install needed libraries for OpenCV on ubuntu
+
+#ansi colors
+#http://www.csc.uvic.ca/~sae/seng265/fall04/tips/s265s047-tips/bash-using-colors.html
+blue='\033[0;34m'
+red='\033[0;31m'
+green='\033[0;32m' # '\e[1;32m' is too bright for white bg.
+endColor='\033[0m'
+
+#
+# a colored message
+#   params:
+#     1: l_color - the color of the message
+#     2: l_msg - the message to display
+#
+color_msg() {
+  local l_color="$1"
+  local l_msg="$2"
+  echo -e "${l_color}$l_msg${endColor}"
+}
+
+# error
+#
+#   show an error message and exit
+#
+#   params:
+#     1: l_msg - the message to display
+error() {
+  local l_msg="$1"
+  # use ansi red for error
+  color_msg $red "Error: $l_msg" 1>&2
+  exit 1
+}
+
+
+
+ # see https://www.learnopencv.com/install-opencv3-on-ubuntu/
+install1() {
+  #Remove any previous installations of x264</h3>
+  sudo apt-get remove x264 libx264-dev
+
+  #We will Install dependencies now
+  install="sudo apt-get install -y"
+  $install build-essential checkinstall cmake pkg-config yasm
+  $install git gfortran
+  $install libjpeg8-dev libjasper-dev libpng12-dev
+
+  # If you are using Ubuntu 14.04
+  #$install libtiff4-dev
+  # If you are using Ubuntu 16.04
+  #$install libtiff5-dev
+
+  $install libavcodec-dev libavformat-dev libswscale-dev libdc1394-22-dev
+  $install libxine2-dev libv4l-dev
+  $install libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev
+  $install qt5-default libgtk2.0-dev libtbb-dev
+  $install libatlas-base-dev
+  $install libfaac-dev libmp3lame-dev libtheora-dev
+  $install libvorbis-dev libxvidcore-dev
+  $install libopencore-amrnb-dev libopencore-amrwb-dev
+  $install x264 v4l-utils
+
+  # Optional dependencies
+  $install libprotobuf-dev protobuf-compiler
+  $install libgoogle-glog-dev libgflags-dev
+  $install libgphoto2-dev libeigen3-dev libhdf5-dev doxygen
+}
+
+# https://researchxuyc.wordpress.com/2018/09/26/install-libjasper-in-ubuntu-18-04/
+# (do not copy code from there - the quotes are wrong!)
+# https://stackoverflow.com/a/48326450/1497139
+# https://github.com/opencv/opencv/issues/8622
+install2() {
+  sudo add-apt-repository "deb http://security.ubuntu.com/ubuntu xenial-security main"
+  sudo apt update
+  sudo apt install -y libjasper1 libjasper-dev
+}
+
+#
+# download a precompiled opencv native library for ubuntu
+#
+downloadLibrary() {
+  # in which directory is this script?
+  mydir=$(dirname $0)
+  # the library is in the neighbour directory ../lib
+  lib="$mydir/../lib/libopencv_java343.so"
+  if [ ! -f $lib ]
+  then
+    color_msg $blue "downloading $lib from JavaCameraApp github repository"
+    curl -L https://github.com/chethan749/JavaCameraApp/blob/master/libopencv_java343.so?raw=true -o $lib
+  else
+    color_msg $green "$lib is already available"
+  fi
+}
+
+#
+# Ubuntu 16 installation steps (python)
+# see e.g. https://stackoverflow.com/questions/42476717/how-to-install-opencv-on-ubuntu-16-04
+#
+install3() {
+  color_msg $blue "checking that pip is installed"
+  which pip > /dev/null
+  if [ $? -ne 0 ]
+  then
+    color_msg $blue "installing pip"
+    curl "https://bootstrap.pypa.io/get-pip.py" -o "/tmp/get-pip.py"
+    sudo python /tmp/get-pip.py
+  else
+    color_msg $green "pip is already installed"
+  fi
+  color_msg $blue "checking whether opencv-python is installed"
+  python -c "import cv2"
+  if [ $? -ne 0 ]
+  then
+    color_msg $blue "installing opencv-python"
+    sudo pip install opencv-python
+  else
+    color_msg $greeno "opencv-python already installed"
+  fi
+  # let's find out the path to opencv
+  # https://stackoverflow.com/questions/15227532/python-opencv-root-directory
+cat << EOF > /tmp/cvpath.py
+import cv2
+from os.path import realpath, normpath
+print(normpath(realpath(cv2.__file__)))
+EOF
+  python /tmp/cvpath.py
+}
+
+
+install4() {
+  install="sudo apt-get install -y"
+  $install libpng-dev
+  $install libpng-dev
+  $install libpng12-dev
+  $install libopenjp2-7-dev
+  $install libjasper-dev
+  $install python-dev
+  $install python-numpy
+  $install build-essential
+  $install cmake
+  $install git
+  $install libgtk2.0-dev
+  $install pkg-config
+  $install libavcodec-dev
+  $install libavformat-dev
+  $install libswscale-dev
+  $install libtbb2
+  $install libtbb-dev
+  $install libjpeg-dev
+  $install libtiff5-dev
+  $install libdc1394-22-dev
+  $install execstack
+  $install ant
+}
+
+# https://www.pyimagesearch.com/2017/09/04/raspbian-stretch-install-opencv-3-python-on-your-raspberry-pi/
+installRaspbianSource() {
+  install="sudo apt-get install -y"
+  $install build-essential cmake pkg-config
+  $install libjpeg-dev libtiff5-dev libjasper-dev libpng12-dev
+  $install libavcodec-dev libavformat-dev libswscale-dev libv4l-dev
+  $install libxvidcore-dev libx264-dev
+  $install libgtk2.0-dev libgtk-3-dev
+  $install libatlas-base-dev gfortran
+}
+
+
+# https://github.com/pageauc/opencv3-setup/issues/3
+# https://raspberrypi.stackexchange.com/a/83682/11220
+# https://stackoverflow.com/a/53402396/1497139
+installRaspbian() {
+  install="sudo apt-get install -y"
+  $install libopencv-dev python3-opencv opencv-doc
+  $install libhdf5-dev libhdf5-serial-dev libatlas-base-dev libjasper-dev  libqtgui4  libqt4-test 
+  $install python2.7-dev python3-dev
+}
+
+
+# https://github.com/emchristiansen/Billy/blob/master/.travis.yml
+install5() {
+  pwd=$(pwd)
+  src=/usr/local/src
+  if [ ! -d $src ]
+  then
+    color_msg $blue "creating $src"
+    sudo mkdir -p $src
+  fi
+  cd $src
+  version=3.4.3
+  zip=opencv-${version}.zip
+  if [ ! -f $zip ]
+  then
+    sudo wget https://github.com/opencv/opencv/archive/$version.zip -O $zip
+  fi
+  if [ ! -d opencv-$version ]
+  then
+    color_msg $blue "unzipping $zip"
+    sudo unzip -q $zip
+    #sudo git clone -b 3.4 https://github.com/opencv/opencv
+  fi
+  color_msg $blue "changing owner to $(id -un).$(id -gn) for opencv-$version"
+  sudo chown -R $(id -un) opencv-$version
+  sudo chgrp -R $(id -gn) opencv-$version
+  lib=${src}/opencv-$version/build/lib/libopencv_java343.so
+  if [ ! -f $lib ]
+  then
+    cd opencv-$version/platforms/maven
+    # prepare a script e.g. for running maven
+    runmaven=/tmp/runmaven$$
+    # create the script with a here document
+cat << EOF > $runmaven
+#!/bin/bash
+# run the maven clean with environment variables set
+export ANT_HOME=/usr/share/ant
+export MAKEFLAGS=-j4
+# https://stackoverflow.com/a/38225337/1497139
+if [ $USER = "travis" ]
+then
+   /usr/local/maven/bin/mvn clean install
+else
+   mvn clean install
+fi
+EOF
+    # make the script executable
+    chmod +x $runmaven
+    # run it
+    color_msg $blue "running maven installation of opencv as superuser"
+    $runmaven
+    # remove it or comment out to keep
+    rm $runmaven
+  fi
+  if [ ! -f $lib ]
+  then
+    error "maven install of opencv failed"
+  else
+    # in which directory is this script?
+    mydir=$(dirname $0)
+    # go there
+    cd $pwd/$mydir
+    # the library is in the neighbour directory ../lib
+    targetlib="../lib/libopencv_java343.so"
+    color_msg $blue "copying $lib to $targetlib"
+    cp -p $lib $targetlib
+  fi
+  #if [ ! -d build ]
+  #then
+  #  sudo mkdir build
+  #fi
+  #cd build
+  # see https://advancedweb.hu/2016/03/01/opencv_ubuntu/
+  #sudo cmake -D BUILD_SHARED_LIBS=OFF ..
+  #sudo make -j4
+  #sudo make -j4 install
+  #mvn install:install-file -Dfile=/usr/local/share/OpenCV/java/opencv-343.jar -DgroupId=opencv -DartifactId=opencv -Dversion=3.4.3 -Dpackaging=jar
+}
+
+# necessary step if you don't want to compile OpenCV manually yourself
+os=$(uname -a)
+case $os in
+  Darwin*)
+    color_msg $blue "found MacOs"
+    install5
+  ;;
+  *)
+  distributor=$(lsb_release -a | grep Distributor | cut -f2 )
+  version=$(lsb_release -a | grep Release | cut -f2 )
+  case $distributor in
+    Ubuntu*) 
+      case $version in
+         18*) color_msg $green "found Ubuntu Bionic Beaver $version"
+           # necessary step on ubuntu 18
+           downloadLibrary
+           install2;;
+         16*) color_msg $green "found Ubuntu Xenial Xerus $version"
+           # necessary step on ubuntu 16
+           #install1
+           install4
+           install5;;
+         14*) color_msg $blue "found Ubuntu Trusty Tahr $version"
+           error "do not know what to do - you might want to check the script yourself" ;;
+          *) 
+           error "found Ubuntu ${version} - i have no clue what to do";;
+       esac
+       ;;
+    Raspbian*)
+       color_msg $green "found Raspbian $version"
+       installRaspbian
+       ;;
+    *) 
+      error "found Distribution ${distributor} - i have no clue what to do";;
+  esac
+esac
+# step might be necessary - try out yourself ...
+#install1
